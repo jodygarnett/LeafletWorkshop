@@ -14,7 +14,7 @@
     
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	
 </head>
 
@@ -25,8 +25,8 @@
 <script>
 
     // Initialize map and set its view to Calgary, Alberta
-    
-	var mymap = L.map('mapid').setView([48.407326, --123.329773], 11);    
+    // var mymap = L.map('mapid').setView([48.407326, -123.329773], 12);    
+	var mymap = L.map('mapid').setView([51.012, -114.0750], 11);    
     
     
     
@@ -42,12 +42,40 @@
 		zoomOffset: -1
 	}).addTo(mymap);
     
+   // loading GeoJSON file - https://www.igismap.com/add-load-geojson-file-point-polyline-polygon-map-leaflet-js/
+	$.getJSON("Census_by_Community_2019.geojson",function(data){
+		// L.geoJson function is used to parse geojson file and load on to map
+		L.geoJson(data, {
+			style: polyStyle
+		}).addTo(mymap);
+	});	
     
     
+    // Define colours based on data ranges (create choropleth map)
+    function colourBreaks(d) {
+        return d > 15000 ? '#b10026' :
+                d > 10000 ? '#e31a1c' :
+                d > 7000 ? '#fc4e2a' :
+                d > 5000 ? '#fd8d3c' :
+                d > 2500 ? '#feb24c' :
+                d > 1 ? '#fed976' :
+                        '#525252';        
+    }
+    
+	// Style polygons and control opacity
+	function polyStyle(feature) {
+		return {
+			weight: 1,
+			fillColor: colourBreaks(feature.properties.res_cnt),
+			color: '#FFFFFF',
+            opacity: 1,
+            fillOpacity: 0.75
+		};
+	}
+	
     // ----------- BEGIN SECTION (Markers, circles, polygons, & popups) ------------- 
     // Enable the code below to show additional elements that can be added to your map. 
     
-    /*
 
 	L.marker([50.95, -114.22]).addTo(mymap)
 		.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
@@ -77,7 +105,6 @@
 	}
 
 	mymap.on('click', onMapClick);
-    */
     
     
     // ----------- END SECTION (Markers, circles, polygons, & popups) ---------------- 
